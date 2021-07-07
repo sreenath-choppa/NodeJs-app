@@ -37,8 +37,8 @@ kind: CronJob
 metadata:
   name: auto-delete
 spec:
+  completions: 1
   schedule: "*/5 * * * *"
-  ttlSecondsAfterFinished: 60
   jobTemplate:
     spec:
       template:
