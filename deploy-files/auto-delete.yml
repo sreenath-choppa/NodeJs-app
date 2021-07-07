@@ -41,6 +41,7 @@ spec:
   schedule: "*/5 * * * *"
   jobTemplate:
     spec:
+      completions: 1
       template:
         spec:
           serviceAccountName: auto-delete
