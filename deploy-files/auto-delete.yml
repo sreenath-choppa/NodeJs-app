@@ -47,7 +47,7 @@ spec:
           containers:
             -
               command: ["/bin/sh","-c"]
-              args: ["kubectl delete deploy $(kubectl get deploy -l app=nodeapp -o jsonpath=\"{.items[0].metadata.name}\"); kubectl delete hpa hpa-nodeapp"]
+              args: ["kubectl delete deploy nodeapp; kubectl delete hpa hpa-nodeapp"]
               image: "bitnami/kubectl:latest"
               name: auto-delete
           restartPolicy: OnFailure
