@@ -31,25 +31,25 @@ kind: ServiceAccount
 metadata:
   name: auto-delete
 
----
 apiVersion: batch/v1beta1
 kind: CronJob
-metadata:
+metadata: 
   name: auto-delete
-spec:
-  completions: 1
-  schedule: "*/5 * * * *"
-  jobTemplate:
-    spec:
+spec: 
+  jobTemplate: 
+    metadata: 
+      name: auto-delete
+    spec: 
       completions: 1
-      template:
-        spec:
-          serviceAccountName: auto-delete
-          containers:
-          - name: auto-delete
-            image: bitnami/kubectl:latest
-            command:
-            - /bin/sh
-            - -c
-            - 'kubectl delete deploy $(kubectl get deploy -l app=nodeapp -o jsonpath="{.items[0].metadata.name}")'
-          restartPolicy: Never
+      template: 
+        spec: 
+          containers: 
+            - 
+              command: 
+                - /bin/sh
+                - "-c"
+                - "kubectl delete deploy $(kubectl get deploy -l app=nodeapp -o jsonpath=\"{.items[0].metadata.name}\")"
+              image: "bitnami/kubectl:latest"
+              name: auto-delete
+          restartPolicy: OnFailure
+  schedule: "*/5 * * * *"
