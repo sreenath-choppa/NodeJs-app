@@ -1,0 +1,54 @@
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: auto-delete
+rules:
+  - apiGroups: [""]
+    resources: ["services", "pods", "replicationcontrollers", "persistentvolumeclaims"]
+    verbs: ["get", "list", "watch", "create", "delete", "update"]
+  - apiGroups: ["apps"]
+    resources: ["statefulsets", "deployments", "replicasets"]
+    verbs: ["get", "list", "watch", "create", "delete", "update", "patch"]
+  - apiGroups: ["extensions"]
+    resources: ["deployments", "replicasets", "job"]
+    verbs: ["get", "list", "watch", "create", "delete", "update", "patch"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: auto-delete
+subjects:
+- kind: ServiceAccount
+  name: auto-delete
+roleRef:
+  kind: Role
+  name: auto-delete
+  apiGroup: ""
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: auto-delete
+
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: auto-delete
+spec:
+  schedule: "*/5 * * * *"
+  ttlSecondsAfterFinished: 60
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: auto-delete
+          containers:
+          - name: auto-delete
+            image: bitnami/kubectl:latest
+            command:
+            - /bin/sh
+            - -c
+            - 'kubectl delete deploy $(kubectl get deploy -l app=nodeapp -o jsonpath="{.items[0].metadata.name}")'
+          restartPolicy: Never
